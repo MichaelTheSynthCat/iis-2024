@@ -1,0 +1,46 @@
+www.utulok.com
+|
+|---/login
+|---/register
+|---/logout
+|---/profile
+|    └──/profile/edit
+|
+|---/users
+|   |---/users/{id}
+|   |   |---/users/{id}/cancel
+|   |   └── /users/{id}/edit
+|   |---/users/create
+|   └── /users?type={type}
+|
+|---/animals
+|   |---/animals/create
+|   |---/animals/{id}
+|   |   |---/animals/{id}/edit
+|   |   |---/animals/{id}/details
+|   |   |---/animals/{id}/history
+|   |   └── /animals/{id}/medical-records
+|   └── /animals?type={type}
+|
+|--- /walks
+│   ├── /walks
+│   ├── /walks/create
+│   ├── /walks/{id}
+│   │   ├── /walks/{id}/edit
+│   │   └── /walks/{id}/assign
+|
+├── /reservations
+│   ├── /reservations
+│   ├── /reservations/create
+│   ├── /reservations/{id}
+│   │   ├── /reservations/{id}/edit
+│   │   └── /reservations/{id}/cancel
+|
+|--- /health-records
+│   ├── /health-records
+│   ├── /health-records/create
+│   ├── /health-records/{id}
+│   │   └── /health-records/{id}/edit
+|
+|---/about
+|---/contact
