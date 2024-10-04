@@ -6,6 +6,8 @@ venv\Scripts\activate
 
 pip install django
 
+python manage.py makemigrations
+python manage.py makemigrations shelter
 python manage.py migrate
 
 python manage.py createsuperuser
