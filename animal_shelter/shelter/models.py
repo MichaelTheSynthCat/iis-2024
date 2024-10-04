@@ -27,7 +27,6 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-# Animal Model
 class Animal(models.Model):
     ANIMAL_TYPES = (
         ('Dog', 'Dog'),
@@ -38,21 +37,19 @@ class Animal(models.Model):
     
     name = models.CharField(max_length=100)
     species = models.CharField(max_length=50, choices=ANIMAL_TYPES)
-    age = models.PositiveIntegerField()
+    date_of_birth = models.DateField()
     description = models.TextField()
     intake_date = models.DateField()
-    is_available = models.BooleanField(default=True)
-    health_status = models.TextField(blank=True, null=True)  # Additional field for health info
 
     def __str__(self):
         return self.name
 
-# Event: Walking Schedule
 class Walk(models.Model):
     animal = models.ForeignKey(Animal, on_delete=models.CASCADE, related_name='walks')
     volunteer = models.ForeignKey(User, limit_choices_to={'role': 'Volunteer'}, on_delete=models.SET_NULL, null=True, blank=True, related_name='volunteer_walks')
     caregiver = models.ForeignKey(User, limit_choices_to={'role': 'Caregiver'}, on_delete=models.CASCADE, related_name='caregiver_walks')
-    scheduled_time = models.DateTimeField()
+    begin_time = models.DateTimeField()
+    end_time = models.DateTimeField()
     STATUS_CHOICES = (
         ('Reserved', 'Reserved'),
         ('Approved', 'Approved'),
@@ -64,7 +61,6 @@ class Walk(models.Model):
     def __str__(self):
         return f"{self.animal.name} walk at {self.scheduled_time}"
 
-# Veterinarian Request Model
 class VeterinarianRequest(models.Model):
     animal = models.ForeignKey(Animal, on_delete=models.CASCADE, related_name='vet_requests')
     caregiver = models.ForeignKey(User, limit_choices_to={'role': 'Caregiver'}, on_delete=models.CASCADE, related_name='caregiver_requests')
@@ -81,18 +77,3 @@ class VeterinarianRequest(models.Model):
 
     def __str__(self):
         return f"Request for {self.animal.name} by {self.caregiver.username}"
-
-# Health Record Model
-class HealthRecord(models.Model):
-    RECORD_TYPES = (
-        ('Checkup', 'Checkup'),
-        ('Vaccination', 'Vaccination'),
-    )
-    type = models.CharField(max_length=20, choices=RECORD_TYPES, default='Checkup')
-    animal = models.ForeignKey(Animal, on_delete=models.CASCADE, related_name='health_records')
-    veterinarian = models.ForeignKey(User, limit_choices_to={'role': 'Veterinarian'}, on_delete=models.CASCADE)
-    date = models.DateField()
-    notes = models.TextField()
-
-    def __str__(self):
-        return f"Health record for {self.animal.name} on {self.checkup_date}"
