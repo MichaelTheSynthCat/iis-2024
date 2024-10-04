@@ -6,9 +6,9 @@ def seed_demo_data():
     for table in tables:
         table.objects.all().delete()
 
-    import animals
+    from .animals import ANIMAL_SEEDS
 
-    seeds = (animals.ANIMAL_SEEDS,)
+    seeds = (ANIMAL_SEEDS,)
     for data in seeds:
         for entry in data:
             entry.save()

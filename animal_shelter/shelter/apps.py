@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 from animal_shelter.settings import SEED_DEMO_DATA
+from django.db.models.signals import post_migrate
 
 
 class ShelterConfig(AppConfig):
@@ -7,7 +8,10 @@ class ShelterConfig(AppConfig):
     name = "shelter"
 
     def ready(self):
-        if SEED_DEMO_DATA:
-            from .seeds import seed_demo_data
+        # Do not remove the two lines below!
 
-            seed_demo_data()
+        # Implicitly connects signal handlers decorated with @receiver.
+        from . import signals
+
+        # This line prevents Pylance from displaying unused import warning.
+        signals
