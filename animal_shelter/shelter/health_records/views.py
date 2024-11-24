@@ -38,6 +38,12 @@ class HealthRecordVetForm(ModelForm):
         })
     )
 
+    def clean_examination_date(self):
+        examination_date = self.cleaned_data.get("examination_date")
+        if examination_date and examination_date < timezone.now():
+            raise forms.ValidationError("Examination date must be either today or in the future.")
+        return examination_date
+
 def user_can_create_request(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
