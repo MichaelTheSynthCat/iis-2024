@@ -1,60 +1,89 @@
 {% extends "base.html" %}
-{% block title %}Edit health record{% endblock %}
+{% block title %}Edit Veterinarian Record{% endblock %}
 {% block content %}
 {% load static %}
 
-<div class="container mt-4">
-    <h1 class="mb-4">Edit Veterinarian Record</h1>
+<form method="post">
+    {% csrf_token %}
+    <div class="container" style="max-width: 1400px; padding: 20px;">
+        <div class="row justify-content-center align-items-center">
+            <!-- Image Container -->
+            <div class="col-md-4 d-flex justify-content-center">
+                <div class="image-container" style="width: 100%; height: auto; max-width: 400px; overflow: hidden; border: 1px solid #ffffff;">
+                    <img id="animal-image"
+                         src="{{ form.instance.animal.image_url|default:'' }}"
+                         alt="{{ form.instance.animal.name|default:'Animal' }}"
+                         onerror="this.src = '{% static 'images/default_animal.png' %}'"
+                         style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+            </div>
 
-    <div class="row">
-        <div class="col-md-4">
-            {% if form.instance.animal.image_url %}
-                <img src="{{ form.instance.animal.image_url }}" alt="{{ form.instance.animal.name }}" class="img-fluid rounded border">
-            {% else %}
-                <div class="d-flex align-items-center justify-content-center bg-light border rounded" style="height: 200px;">
-                    <span>No Image</span>
-                </div>
-            {% endif %}
-        </div>
-        <div class="col-md-8">
-            <form method="post" class="needs-validation" novalidate>
-                {% csrf_token %}
-                <div class="form-group mb-3">
-                    <label for="id_status" style="font-size: 1.2rem;">Status</label>
-                    {{ form.status }}
-                    {% if form.status.errors %}
-                    <div class="text-danger" style="font-size: 0.9rem;">
-                        {{ form.status.errors.0 }}
+            <!-- Form Fields -->
+            <div class="col-md-6 d-flex justify-content-center">
+                <div class="w-100">
+
+                    <!-- Status Field -->
+                    <div class="form-group mb-3">
+                        <label for="id_status" style="font-size: 1.2rem;">Status</label>
+                        <select id="id_status" name="status" class="form-control" style="font-size: 1.2rem;">
+                            {% for value, label in form.status.field.choices %}
+                                <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if form.status.errors %}
+                        <div class="text-danger" style="font-size: 0.9rem;">
+                            {{ form.status.errors.0 }}
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
-                </div>
-                <div class="form-group mb-3">
-                    <label for="id_examination_date" style="font-size: 1.2rem;">Examination Date and Time</label>
-                    <input type="datetime-local" id="id_examination_date" name="examination_date" value="{{ form.examination_date.value|date:'Y-m-d\\TH:i' }}" class="form-control" style="width: auto;">
-                    {% if form.examination_date.errors %}
-                    <div class="text-danger" style="font-size: 0.9rem;">
-                        {{ form.examination_date.errors.0 }}
+
+                    <!-- Examination Date Field -->
+                    <div class="form-group mb-3">
+                        <label for="id_examination_date" style="font-size: 1.2rem;">Examination Date and Time</label>
+                        <input type="text"
+                               id="id_examination_date"
+                               name="examination_date"
+                               value="{{ form.examination_date.value|default:'' }}"
+                               class="form-control flatpickr"
+                               style="font-size: 1.2rem;">
+                        {% if form.examination_date.errors %}
+                        <div class="text-danger" style="font-size: 0.9rem;">
+                            {{ form.examination_date.errors.0 }}
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
-                </div>
-                <div class="form-group mb-3">
-                    <label for="id_result" style="font-size: 1.2rem;">Result</label>
-                    <div>
-                        {{ form.result }}
+
+                    <!-- Result Field -->
+                    <div class="form-group mb-3">
+                        <label for="id_result" style="font-size: 1.2rem;">Result</label>
+                        <textarea id="id_result" name="result" class="form-control" rows="4" style="font-size: 1.2rem;">{{ form.result.value }}</textarea>
+                        {% if form.result.errors %}
+                        <div class="text-danger" style="font-size: 0.9rem;">
+                            {{ form.result.errors.0 }}
+                        </div>
+                        {% endif %}
                     </div>
-                    {% if form.result.errors %}
-                    <div class="text-danger" style="font-size: 0.9rem;">
-                        {{ form.result.errors.0 }}
+
+                    <!-- Save and Cancel Buttons -->
+                    <div class="form-group mb-3 d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary" style="font-size: 1.2rem;">Save</button>
+                        <a href="{% url 'health_records_detail' form.instance.animal.id %}" class="btn btn-secondary" style="font-size: 1.2rem;">Cancel</a>
                     </div>
-                    {% endif %}
                 </div>
-                <div class="d-flex justify-content-start">
-                    <button type="submit" class="btn btn-primary me-2">Save</button>
-                    <a href="{% url 'health_records_detail' form.instance.animal.id %}" class="btn btn-secondary">Cancel</a>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
+</form>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        flatpickr("#id_examination_date", {
+            enableTime: true,
+            dateFormat: "d.m.Y H:i",
+            time_24hr: true,
+        });
+    });
+</script>
 {% endblock %}
