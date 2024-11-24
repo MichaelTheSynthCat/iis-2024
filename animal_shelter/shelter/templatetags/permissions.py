@@ -8,7 +8,7 @@ register = template.Library()
 @register.filter
 def can_manage_animals(user):
     """Check if the user can manage animals."""
-    return user.role in [User.Role.CAREGIVER, User.Role.ADMINISTRATOR]
+    return user.role == User.Role.CAREGIVER
 
 
 @register.filter
@@ -33,7 +33,7 @@ def is_vet(user):
 @register.filter
 def can_manage_walks(user):
     """Check if the user can manage walks."""
-    return user.role in [User.Role.CAREGIVER, User.Role.ADMINISTRATOR]
+    return user.role == User.Role.CAREGIVER
 
 @register.filter
 def can_create_health_records(user: User | AbstractUser):    

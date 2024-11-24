@@ -142,6 +142,7 @@ def walks_list(request, id=None):
 @user_can_manage_walks
 def walk_create(request, animal_id):
     animal = get_object_or_404(Animal, id=animal_id)
+
     if request.method == 'POST':
         form = WalkForm(request.POST)
         if form.is_valid():
@@ -151,8 +152,15 @@ def walk_create(request, animal_id):
             walk.save()
             return redirect('walks_list')
     else:
-        form = WalkForm(initial={'animal': animal})
+        initial_data = {
+            'begin_time': '',
+            'end_time': '',
+            'animal': animal,
+        }
+        form = WalkForm(initial=initial_data)
+
     return render(request, 'walks/create.html', {'form': form, 'animal': animal})
+
 
 @login_required
 def walk_detail(request, walk_id):
