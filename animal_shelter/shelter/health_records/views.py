@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.db.models import Case, When, IntegerField
 from django.utils import timezone
+from django import forms
+from django.forms.widgets import DateTimeInput
 
 class HealthRecordCaregiverForm(ModelForm):
     veterinarian = ModelChoiceField(
@@ -26,15 +28,15 @@ class HealthRecordVetForm(ModelForm):
     class Meta:
         model = VeterinarianRequest
         fields = ["status", "examination_date", "result"]
-        widgets = {
-            "examination_date": DateTimeInput(attrs={"type": "datetime-local"}),
-        }
 
-    def clean_examination_date(self):
-        examination_date = self.cleaned_data.get("examination_date")
-        if examination_date and examination_date < timezone.now():
-            raise forms.ValidationError("Examination date must be either today or in the future.")
-        return examination_date
+    examination_date = forms.DateTimeField(
+        input_formats=["%d.%m.%Y %H:%M"],
+        widget=forms.DateTimeInput(attrs={
+            "type": "text",
+            "class": "form-control flatpickr",
+            "placeholder": "dd.mm.YYYY HH:MM"
+        })
+    )
 
 def user_can_create_request(view_func):
     @wraps(view_func)
@@ -89,19 +91,23 @@ def health_records_caregiver_edit(request, animal_id, id):
 @login_required
 @user_can_manage_request
 def health_records_vet_edit(request, animal_id, id):
+    # Fetch the health record and ensure it's associated with the correct animal
     health_record = get_object_or_404(VeterinarianRequest, id=id, animal_id=animal_id)
-    if request.method == "POST":
+
+    if request.method == 'POST':
         form = HealthRecordVetForm(request.POST, instance=health_record)
-        if form.is_valid() and health_record.examination_date is not None:
-            health_record.save()
-            return redirect("health_records_detail", id=animal_id)
-        else:
-            # If form is invalid keep old data
-            form = HealthRecordVetForm(instance=health_record)
-            return redirect("health_records_detail", id=animal_id)
+        if form.is_valid():
+            form.save()
+            return redirect('health_records_detail', id=animal_id)
     else:
-        form = HealthRecordVetForm(instance=health_record)
-    return render(request, "health_records/edit_vet.html", {"form": form, "animal_id": animal_id})
+        # Format the initial values for the examination_date field
+        initial_data = {
+            'examination_date': health_record.examination_date.strftime('%d.%m.%Y %H:%M') if health_record.examination_date else ''
+        }
+        form = HealthRecordVetForm(instance=health_record, initial=initial_data)
+
+    return render(request, 'health_records/edit_vet.html', {'form': form, 'animal_id': animal_id})
+
 
 @login_required
 def health_records_detail(request, id):
