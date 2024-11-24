@@ -140,11 +140,12 @@ class VeterinarianRequest(models.Model):
         blank=True,
         related_name="vet_requests",
     )
-    request_date = models.DateField(auto_now_add=True)
+    request_date = models.DateField()
     status = models.CharField(
         max_length=20, choices=Status.choices, default=Status.REQUESTED
     )
     examination_date = models.DateTimeField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     result = models.TextField(null=True, blank=True)
 
     def __str__(self):

@@ -8,16 +8,27 @@ from collections import defaultdict
 from ..models import Walk, Animal, User
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
+from django.forms.widgets import DateTimeInput
+from django import forms
 
 class WalkForm(ModelForm):
     class Meta:
         model = Walk
-        fields = ['animal', 'volunteer', 'caregiver', 'begin_time', 'end_time', 'status']
+        fields = ['volunteer', 'begin_time', 'end_time', 'status']
         widgets = {
-            'begin_time': DateTimeInput(attrs={'type': 'datetime-local'}),
-            'end_time': DateTimeInput(attrs={'type': 'datetime-local'}),
+            'begin_time': DateTimeInput(attrs={'type': 'datetime-local', 'format': '%d.%m.%Y %H:%M'}),
+            'end_time': DateTimeInput(attrs={'type': 'datetime-local', 'format': '%d.%m.%Y %H:%M'}),
         }
-    
+
+    begin_time = forms.DateTimeField(
+        input_formats=['%d.%m.%Y %H:%M'],
+        widget=forms.DateTimeInput(attrs={'type': 'text', 'placeholder': 'dd.mm.YYYY HH:MM'})
+    )
+    end_time = forms.DateTimeField(
+        input_formats=['%d.%m.%Y %H:%M'],
+        widget=forms.DateTimeInput(attrs={'type': 'text', 'placeholder': 'dd.mm.YYYY HH:MM'})
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not self.instance.pk:
@@ -42,7 +53,7 @@ class WalkForm(ModelForm):
                 begin_time__lt=end_time,
                 end_time__gt=begin_time
             ).exclude(id=self.instance.id)
-            
+
             if overlapping_walks.exists():
                 raise ValidationError(_("This walk overlaps with another walk for the same animal."))
 
@@ -69,7 +80,7 @@ def walks_list(request, id=None):
             else:
                 return HttpResponseForbidden("Access Denied: Only volunteers can choose a walk.")
         elif action == 'approve':
-            if request.user.role == User.Role.CAREGIVER and walk.can_be_approved_by_caregiver():
+            if request.user.role == User.Role.CAREGIVER and walk.can_be_approved_by_caregiver() and walk.caregiver == request.user :
                 walk.status = Walk.Status.APPROVED
                 walk.save()
             else:
@@ -129,15 +140,27 @@ def walks_list(request, id=None):
 
 @login_required
 @user_can_manage_walks
-def walk_create(request):
+def walk_create(request, animal_id):
+    animal = get_object_or_404(Animal, id=animal_id)
+
     if request.method == 'POST':
         form = WalkForm(request.POST)
         if form.is_valid():
-            form.save()
+            walk = form.save(commit=False)
+            walk.caregiver = request.user
+            walk.animal = animal
+            walk.save()
             return redirect('walks_list')
     else:
-        form = WalkForm()
-    return render(request, 'walks/create.html', {'form': form})
+        initial_data = {
+            'begin_time': '',
+            'end_time': '',
+            'animal': animal,
+        }
+        form = WalkForm(initial=initial_data)
+
+    return render(request, 'walks/create.html', {'form': form, 'animal': animal})
+
 
 @login_required
 def walk_detail(request, walk_id):
@@ -148,19 +171,33 @@ def walk_detail(request, walk_id):
 @user_can_manage_walks
 def walk_edit(request, walk_id):
     walk = get_object_or_404(Walk, pk=walk_id)
+    # Check if the logged-in user is the caregiver who created the walk
+    if walk.caregiver != request.user:
+        return HttpResponseForbidden("Access Denied: Only the caregiver who created this walk can edit it.")
+
     if request.method == 'POST':
         form = WalkForm(request.POST, instance=walk)
         if form.is_valid():
             form.save()
             return redirect('walks_list')
     else:
-        form = WalkForm(instance=walk)
+        # Format the initial values for display
+        initial_data = {
+            'begin_time': walk.begin_time.strftime('%d.%m.%Y %H:%M') if walk.begin_time else '',
+            'end_time': walk.end_time.strftime('%d.%m.%Y %H:%M') if walk.end_time else '',
+        }
+        form = WalkForm(instance=walk, initial=initial_data)
+
     return render(request, 'walks/edit.html', {'form': form})
 
 @login_required
 @user_can_manage_walks
 def walk_delete(request, walk_id):
     walk = get_object_or_404(Walk, pk=walk_id)
+    # Check if the logged-in user is the caregiver who created the walk
+    if walk.caregiver != request.user:
+        return HttpResponseForbidden("Access Denied: Only the caregiver who created this walk can delete it.")
+
     if request.method == 'POST':
         walk.delete()
         return redirect('walks_list')
