@@ -23,9 +23,9 @@
             <form class="d-flex align-items-center" method="post">
                 {% csrf_token %}
                 {% if user|is_volunteer %}
-                    <a href="#" class="btn btn-info btn-lg me-2">Schedule a walk</a>
+                    <a href="{% url 'walks_list' id=animal.id %}" class="btn btn-info btn-lg me-2">Schedule a walk</a>
                 {% elif user|is_vet %}
-                    <a href="#" class="btn btn-info btn-lg me-2">Health records</a>
+                    <a href="{% url 'health_records_detail' id=animal.id %}" class="btn btn-info btn-lg me-2">Health records</a>
                 {% elif user|can_manage_animals %}
                     <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                         <div style="flex-basis: 100%; display: flex; gap: 10px;">
@@ -33,7 +33,7 @@
                             <a href="{% url 'walks_list' id=animal.id %}" class="btn btn-info btn-lg me-2">Walk schedule</a>
                         </div>
                         <div style="flex-basis: 100%; display: flex; gap: 10px;">
-                            <a href="{% url 'health_records_detail' animal.id %}" class="btn btn-info btn-lg me-2">Health Records</a>
+                            <a href="{% url 'health_records_detail' id=animal.id %}" class="btn btn-info btn-sm me-2">Health records</a>
                             <a href="{% url 'animal_edit' animal.id %}" class="btn btn-warning btn-lg me-2">Edit</a>
                             <button type="submit" formaction="{% url 'animal_delete' animal.id %}" class="btn btn-danger btn-lg">
                                 Delete
