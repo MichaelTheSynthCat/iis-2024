@@ -28,7 +28,7 @@ urlpatterns = [
     path("animals/<int:id>/edit/", animal_views.animal_edit, name="animal_edit"),
     path("animals/<int:id>/delete/", animal_views.animal_delete, name="animal_delete"),
     path("animals/<int:id>/walks/", walk_views.walks_list, name="walks_list"),
-    path("animals/<int:id>/heatlh_records/", health_records_views.health_records_detail, name="health_records_detail"),
+    path("animals/<int:id>/health_records/", health_records_views.health_records_detail, name="health_records_detail"),
 
     path("animals/<int:animal_id>/health_records/create/", health_records_views.health_records_create, name="health_records_create"),
     path("animals/<int:animal_id>/health_records/<int:id>/edit_caregiver/", health_records_views.health_records_caregiver_edit, name="health_records_caregiver_edit"),

@@ -16,6 +16,7 @@ class AnimalForm(ModelForm):
             "intake_date": DateInput(attrs={"type": "date"}),
         }
 
+# Prevent urls that do not point directly to an image from being saved to DB
 def is_valid_image_url(url):
     if not url:
         return False

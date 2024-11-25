@@ -22,23 +22,22 @@
             <div class="col-md-6 d-flex justify-content-center">
                 <div class="w-100">
 
-                    <!-- Veterinarian Drop-down -->
-                    <div class="form-group mb-3">
-                        <label for="id_veterinarian" style="font-size: 1.2rem;">Veterinarian</label>
-                        <select name="veterinarian" id="id_veterinarian" class="form-control" style="font-size: 1.2rem;">
-                            <option value="" disabled {% if not form.veterinarian.value %}selected{% endif %}>Select a Veterinarian</option>
-                            {% for value, label in form.veterinarian.field.choices %}
-                                <option value="{{ value }}" {% if form.veterinarian.value == value %}selected{% endif %}>
-                                    {{ label }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                        {% if form.veterinarian.errors %}
-                        <div class="text-danger" style="font-size: 0.9rem;">
-                            {{ form.veterinarian.errors.0 }}
-                        </div>
-                        {% endif %}
+                    <div class="mb-4">
+                        <h2 style="font-size: 2.5rem; margin: 0;">
+                            New Health Record for {{ animal.name|default:"this animal" }}
+                        </h2>
                     </div>
+
+                    <!-- Veterinarian Drop-down -->
+                    <label for="id_veterinarian" style="font-size: 1.2rem;">Veterinarian</label>
+                    <select name="veterinarian" id="id_veterinarian" class="form-control" style="font-size: 1.2rem;">
+                        <option value="" {% if not form.veterinarian.value %}selected{% endif %}>None</option>
+                        {% for value, label in form.veterinarian.field.choices %}
+                            <option value="{{ value }}" {% if form.veterinarian.value == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
 
                     <!-- Description -->
                     <div class="form-group mb-3">

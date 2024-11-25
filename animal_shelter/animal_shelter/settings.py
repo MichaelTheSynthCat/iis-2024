@@ -178,6 +178,6 @@ SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 AUTO_LOGOUT = {
-    "SESSION_TIME": 10 * 60,  # 10 minutes
+    "SESSION_TIME": 30 * 60,  # 30 minutes
     "MESSAGE": "You have been automatically logged out due to inactivity.",
 }
