@@ -6,7 +6,7 @@
 
 <div class="container mt-4">
     <!-- Animal Details and Create Request Button -->
-    <div class="d-flex justify-content-between align-items-start mb-4">
+    <div class="d-flex justify-content-between align-items-start mb-4" style="position: relative;">
         <!-- Image Container -->
         <div class="d-flex align-items-center">
             <div style="flex-shrink: 0; max-width: 150px; max-height: 200px; width: 50vw; height: 50vw; display: flex; align-items: left; justify-content: left; border: 1px solid #ffffff; padding-right: 15px;">
@@ -21,21 +21,22 @@
                 <p class="fs-6"><strong>Description:</strong> {{ animal.description }}</p>
             </div>
         </div>
-
+    
         <!-- Create Request Button -->
         {% if logged_in_user|can_create_health_records %}
-        <div>
+        <div class="d-flex align-items-end justify-content-end" style="position: absolute; bottom: 0; right: 0;">
             <a href="{% url 'health_records_create' animal.id %}" class="btn btn-success">Create Request</a>
         </div>
         {% endif %}
     </div>
+    
 
     <!-- Health Records -->
     <div class="mt-5">
         {% if health_records %}
             <ul class="list-group mt-4">
                 {% for record in health_records %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: #f9f9f9">
                         <div>
                             <h5 class="mb-1">Status: {{ record.get_status_display }}</h5>
                             <p class="mb-1"><strong>Request Date:</strong> {{ record.request_date }}</p>

@@ -34,7 +34,7 @@ class WalkForm(ModelForm):
         if not self.instance.pk:
             self.fields['status'].initial = Walk.Status.AVAILABLE
 
-    # Custom validation to ensure end_time is after begin_time and no overlapping walks
+    # Custom validation to ensure end_time is after begin_time and no walks overlap
     def clean(self):
         cleaned_data = super().clean()
         animal = cleaned_data.get("animal")
@@ -171,6 +171,8 @@ def walk_detail(request, walk_id):
 @user_can_manage_walks
 def walk_edit(request, walk_id):
     walk = get_object_or_404(Walk, pk=walk_id)
+    animal = get_object_or_404(Animal, id=walk.animal.id)
+
     # Check if the logged-in user is the caregiver who created the walk
     if walk.caregiver != request.user:
         return HttpResponseForbidden("Access Denied: Only the caregiver who created this walk can edit it.")
@@ -178,7 +180,10 @@ def walk_edit(request, walk_id):
     if request.method == 'POST':
         form = WalkForm(request.POST, instance=walk)
         if form.is_valid():
-            form.save()
+            walk = form.save(commit=False)
+            walk.caregiver = request.user
+            walk.animal = animal
+            walk.save()
             return redirect('walks_list')
     else:
         # Format the initial values for display

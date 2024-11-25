@@ -260,6 +260,8 @@ def user_edit(request: HttpRequest, id: int):
     result = _user_modification(request, id, context)
     if result:
         return result
+    
+    context["profile_edit"] = False
 
     return render(request, "users/edit.html", context)
 
@@ -323,7 +325,7 @@ def profile_edit(request: HttpRequest):
     else:
         form = ProfileEditForm(instance=user)
 
-    return render(request, "users/edit.html", {"form": form, "user": user})
+    return render(request, "users/edit.html", {"form": form, "user": user, "profile_edit": True})
 
 
 @login_required

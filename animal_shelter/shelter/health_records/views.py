@@ -15,6 +15,7 @@ class HealthRecordCaregiverForm(ModelForm):
         required=False,
         widget=Select,
         label="Veterinarian",
+        empty_label=None
     )
     class Meta:
         model = VeterinarianRequest
@@ -72,6 +73,10 @@ def health_records_create(request, animal_id):
             health_record.request_date = timezone.now()
             health_record.caregiver = request.user
             health_record.animal = animal
+
+            if not form.cleaned_data.get('veterinarian'):
+                health_record.veterinarian = None
+
             health_record.save()
             return redirect("health_records_detail", id=animal.id)
     else:
@@ -88,7 +93,11 @@ def health_records_caregiver_edit(request, animal_id, id):
     if request.method == "POST":
         form = HealthRecordCaregiverForm(request.POST, instance=health_record)
         if form.is_valid():
-            form.save()
+            health_record = form.save(commit=False)
+            if not form.cleaned_data.get('veterinarian'):
+                health_record.veterinarian = None
+
+            health_record.save()
             return redirect("health_records_detail", id=animal_id)
     else:
         form = HealthRecordCaregiverForm(instance=health_record)
