@@ -5,8 +5,7 @@
 
 # Run this script after all Python dependencies are installed.
 
-python manage.py makemigrations shelter
-python manage.py migrate shelter
-python manage.py migrate
+SEED_DEMO_DATA=False python manage.py migrate shelter
+SEED_DEMO_DATA=True python manage.py migrate
 
 python manage.py collectstatic --noinput # prepare static files
