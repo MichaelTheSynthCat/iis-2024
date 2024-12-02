@@ -16,6 +16,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SEED_USER_PWD=<default_password_of_seeded_users>
 # DATABASE_URL=<see dj_database_url usage>
 
+# Create migrations if models.py is modified:
+# SEED_DEMO_DATA=False python manage.py makemigrations shelter
+
 # Set SECRET_KEY in production!
 _development_key = "django-insecure-$(!hr+2ddrbr^o75u5q0d(8immx-jfcmg)##o7mh4j3%h%^_bx"
 SECRET_KEY = os.getenv("SECRET_KEY", _development_key)
@@ -166,7 +169,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-SEED_DEMO_DATA = True
+SEED_DEMO_DATA = os.getenv("SEED_DEMO_DATA", "True") == "True"
 SEED_USER_PWD = os.getenv("SEED_USER_PWD", "password")
 
 AUTH_USER_MODEL = "shelter.User"
